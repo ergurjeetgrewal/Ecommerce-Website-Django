@@ -1,0 +1,23 @@
+{% extends 'shop/base.html' %}
+{% block title %}Checkout
+{% endblock title %}
+{% block body %}
+<div class="container mt-2">
+    {{response}}
+    <div class="col">
+        <h2>Your order ID is {{response.ORDERID}}</h2>
+        {% if response.RESPCODE == '01' %}
+        <h2>Order Success</h2>
+        {% else %}
+        <h2>Your order ID is {{response.ORDERID}}</h2>
+        {% endif %}
+    </div>
+    <div class="col my-2">
+        <h2>Your Orders</h2>
+    </div>
+</div>
+{% endblock body %}
+{% block jss %}
+<script>
+</script>
+{% endblock jss %}

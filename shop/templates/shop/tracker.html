@@ -1,0 +1,96 @@
+{% extends 'shop/base.html' %}
+{% block title %}Tracker
+{% endblock title %}
+{% block active4 %}active
+{% endblock active4 %}
+{% block body %}
+<div class="container mt-2">
+    <div class="col">
+        <h2>Step 1 - Tracker -Track your orders</h2>
+        <form method="POST" action="#" id="trackerForm">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="inputname">Order_id</label>
+                    <input type="text" class="form-control" id="inputname" name="orderid" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="inputEmail">Email</label>
+                    <input type="email" class="form-control" id="inputEmail" name="email" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Place Order</button>
+        </form>
+    </div>
+    <div class="col my-2">
+        <h2>Step 2 - Your Order Details</h2>
+        <div>
+            <ul class="list-group" id="itemsdetail">
+                Please Enter Order Id and Email
+            </ul>
+        </div>
+    </div>
+    <div class="col my-2">
+        <h2>Step 3 - Your Order Status</h2>
+        <div>
+            <ul class="list-group" id="items">
+                Please Enter Order Id and Email
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+{% block jss %}
+<script>
+    $('#trackerForm').submit(function (event) {
+        $('#items').empty()
+        $('#itemsdetail').empty()
+        var formdata = {
+            'orderid': $('input[name=orderid]').val(),
+            'email': $('input[name=email]').val(),
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        };
+        $.ajax({
+            type: "POST",
+            url: '/shop/tracker/',
+            data: formdata,
+            encode: true
+        })
+            .done(function (data) {
+                console.log(data)
+                data = JSON.parse(data)
+                updates = data[0];
+                if (isEmpty(updates) & updates != {}) {
+                    for (i = 0; i < updates.length; i++) {
+                        let text = updates[i]['text']
+                        let time = updates[i]['time']
+                        mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">${text}
+    <span class="badge badge-primary badge-pill">${time}</span></li>`
+                        $('#items').append(mystr);
+                    }
+                    cart = JSON.parse(data[1])
+                    for (var item in cart) {
+                        let name = cart[item][1]
+                        let qty = cart[item][0]
+                        mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">${name}
+    <span class="badge badge-primary badge-pill">${qty}</span></li>`
+                        $('#itemsdetail').append(mystr);
+                    }
+                }
+                else {
+                    mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">Sorry Please verify orderid and email combination or connect with team</li>`
+                    $('#items').append(mystr);
+                    $('#itemsdetail').append(mystr);
+                }
+            });
+        event.preventDefault();
+    });
+    function isEmpty(obj) {
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key))
+                return true;
+        }
+        return false;
+    }
+</script>
+{% endblock jss %}
